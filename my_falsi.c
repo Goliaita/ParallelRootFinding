@@ -1,6 +1,6 @@
 #include "functions.h"
 
-#define f(x) pow(x,2)+x-5
+#define f(x) pow(x,3)+2*pow(x,2)-5*x-2
 
 
 int main (int argc, char* argv[]) {
@@ -8,14 +8,12 @@ int main (int argc, char* argv[]) {
     /**
      * Set initial variable
      */
-    funcions func;
-    initial_variable vars;
+    funcions *func;
+    initial_variable *vars;
 
-    vars.x0 = -2;
-    vars.x1 = 2;
-    vars.e  = 0.001;
-
-    float xs;
+    func = malloc(sizeof(funcions));
+    vars = malloc(sizeof(initial_variable));
+    
     int step = 1;
     int max_steps;
 
@@ -26,15 +24,19 @@ int main (int argc, char* argv[]) {
 
     vars = get_parameters(argc, argv);
 
+    printf("Function found by main in: %s\n", vars->function);
+
+
     /**
      * Initialize remaining variables
      */
-    max_steps = (int)(vars.x1-vars.x0)/vars.e;
+    max_steps = (int)(vars->x1-vars->x0)/vars->e;
 
-    printf("steps are: %d", max_steps);
-
-	func.f0 = f(vars.x0);
-	func.f1 = f(vars.x1);
+    vars->xs = vars->x0;
+	func->f0 = compute_function(vars);
+    
+    vars->xs = vars->x1;
+	func->f1 = compute_function(vars);
 
 
     /**
@@ -42,29 +44,29 @@ int main (int argc, char* argv[]) {
      */
 	printf("\nStep\t\tx0\t\tx1\t\tx2\t\tf(x2)\n");
 
-    for(int i=0; i < 300; i++){
+    for(int i=0; i < max_steps; i++){
     
-	    xs = vars.x0 - (vars.x0-vars.x1) * func.f0/(func.f0-func.f1);
-		func.fs = f(xs);
-		printf("%d\t\t%f\t%f\t%f\t%f\n",step, vars.x0, vars.x1, xs, func.fs);
+	    vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);
+		func->fs = compute_function(vars);
 		
-		if(func.f0*func.fs < 0){
-			vars.x1 = xs;
-		    func.f1 = func.fs;
+		if(func->f0*func->fs < 0){
+			vars->x1 = vars->xs;
+		    func->f1 = func->fs;
 		} else {
-			vars.x0 = xs;
-			func.f0 = func.fs;
+			vars->x0 = vars->xs;
+			func->f0 = func->fs;
 		}
 		step = step + 1;
 
-        if(fabs(func.fs)<vars.e) break;
+        if(fabs(func->fs)<vars->e) break;
 
     }
 
+	printf("%d\t\t%f\t%f\t%f\t%f\n",step, vars->x0, vars->x1, vars->xs, func->fs);
     /**
      * Print the result
      */
-    printf("\nRoot is: %f\n", xs);
+    printf("\nRoot is: %f\n", vars->xs);
 
     return 0;
 }
