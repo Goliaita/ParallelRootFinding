@@ -1,10 +1,16 @@
 
 # Qui andranno varie opzioni per compilare i file
-CFLAGS = -O3
+PFLAGS = -O3 -Wall -lm
+SFLAGS = -Wall -lm
 
 # Qui andranno i file .c da compilare con il relativo nome di output
-MAINC = main.c
-MAINO = main
+FUNC = functions.c
+
+MAINSEQ = falsi_seq.c
+OUTSEQ = falsi_seq
+
+MAINP = falsi_par.c
+OUTP = falsi_par
 
 
 # Qui vanno inseriti i flag per il run 
@@ -13,22 +19,22 @@ RUNFLAGS = --oversubscribe -n
 
 
 install:
-	sudo apt install openmpi-bin openmpi-common openssh-client openssh-server  libopenmpi-dev libomp-10-dev libomp5-10 libomp-dev
+	sudo apt install mpich
 
 compile: 
-	mpicc $(FLAGS) $(MAINC) -o $(MAINO)
+	mpicc $(PFLAGS) $(MAINP) $(FUNC) -o $(MAINO) 
 
 compile-seq:
-	gcc -Wall my_falsi.c -o my_falsi -lm -ggdb
+	gcc $(SFLAGS) $(MAINSEQ) $(FUNC) -o $(OUTSEQ) 
 
 run-seq:
-	./my_falsi -x0 -1.5 -x1 2.3 -e 0.0003
+	./my_falsi -x0 -1.5 -x1 2.3 -e 0.0003 -f functions.txt
 	
 run: 
 	mpiexec $(RUNFLAGS) $(N) $(MAINO) $(PARAMS)
 
-run_pres:
+run-pres:
 	mpiexec $(RUNFLAGS) 5 $(MAINO)
 
 clean:
-	rm main test my_falsi newton falsi_method 2>/dev/null
+	rm $(OUTSEQ) $(OUTP) 2>/dev/null
