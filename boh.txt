@@ -1,0 +1,29 @@
+program newtonmethod
+implicit none
+real:: f,fprime,xn,tol
+integer:: k,N
+tol=0.001
+k=1write(*,*)"Enter number of iterations and a guess for the root."
+read(*,*) N,xndo while (1 .eq. 1)
+    if (k .eq. N) then
+        print*, "Failed. Try again with more iterations or a different guess."
+        exit
+    else if (fprime(xn) .eq. 0) then
+        print*, "Encountered a stationary point. Try again with a different guess."
+        exit
+    else if (abs(f(xn)) .lt. tol) then
+        print*, "The root is",xn
+        print*, "Finished in",k,"iterations."
+        exit
+    end if
+    xn = xn-f(xn)/fprime(xn)
+    k = k+1
+end doend program newtonmethodfunction f(x)
+real:: x
+f = 3*x**4-5*x**3+2*x**2-x-1
+return
+end function ffunction fprime(y)
+real:: y
+fprime = 12*y**3-15*y**2+4*y-1
+return
+end function fprime
