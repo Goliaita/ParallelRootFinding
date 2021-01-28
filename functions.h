@@ -8,6 +8,7 @@ typedef struct {
     float x0;
     float x1;
     float e;
+    char function[50];
 } initial_variable;
 
 typedef struct {
@@ -15,11 +16,22 @@ typedef struct {
     float f1;
     float fs;
 } funcions;
+initial_variable get_parameters(int argc, char* argv[]);
+
+
+
+
+
+
+
+
 
 
 initial_variable get_parameters(int argc, char* argv[]){
 
     initial_variable params;
+    FILE *fp;
+    char line[50];
 
     if (argc > 1) {
         for (int i=0; i<argc; i++) {
@@ -33,7 +45,22 @@ initial_variable get_parameters(int argc, char* argv[]){
 
             } else if (strcmp(argv[i], "-e") == 0) {
 
-                params.e = atof(argv[i+1]);  
+                params.e = atof(argv[i+1]); 
+
+            } else if (strcmp(argv[i], "-f") == 0) {
+
+                fp = fopen(argv[i+1], "r");
+
+                if (!fp) {
+                    perror("Error while opening the file.\n");
+                    exit(1);
+                }
+                while (!feof (fp)) {
+                if (fgets(line, sizeof (line), fp)) {
+                    printf("function found is: %s\n", line);
+                    strcpy(params.function,line); 
+                    }
+                }
 
             } else if (strcmp(argv[i], "-a") == 0) {
 
