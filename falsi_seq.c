@@ -44,7 +44,7 @@ int main (int argc, char* argv[]) {
      */
 	printf("\nStep\t\tx0\t\tx1\t\tx2\t\tf(x2)\n");
 
-    for(int i=0; i < max_steps; i++){
+    for(int i=0; i < 10; i++){
     
 	    vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);
 		func->fs = compute_function(vars);

@@ -1,5 +1,17 @@
 #include "functions.h"
 
+
+/**
+ * Support function
+ */
+
+float get_ris(int *bool_sub, int *bool_fraction, float *ris, float *buff_fraction,
+        float *buff_number, float *buff_var);
+
+float get_number(int *i, initial_variable *param);
+
+
+
 /**
  * Function that manage the parameters sent by command line
  * -x0 get the lower bound constraint (float)
@@ -98,18 +110,28 @@ initial_variable *get_parameters(int argc, char* argv[]){
 
 
 float compute_function(initial_variable *param){
+    printf("xs è: %f", param->xs);
 
-    int bool_exp = 0;
-    float buff_number = 1;
-    float buff_exp = 1;
-    float buff_var = 1;
-    float ris = 0;
-    int sub = 0;
+    float buff_number   = 1;
+    float buff_exp      = 1;
+    float buff_var      = 1;
+    float buff_fraction = 1;
+    float ris           = 0;
+
+    int bool_sub        = 0;
+    int bool_exp        = 0;
+    int bool_brackets   = 0;
+    int bool_fraction   = 0;
+    int bool_first_n    = 0;
+
 
     for(int i = 0; i<param->size; i++) {
+
         switch(param->function[i]) {
         case 'x':
             buff_var = param->xs;
+            bool_first_n = 0;
+            bool_exp = 0;
             break;
 
         case '0':
@@ -122,13 +144,19 @@ float compute_function(initial_variable *param){
         case '7':
         case '8':
         case '9':
-            if(bool_exp == 1){
-                buff_exp = atof(&param->function[i]);
+            
+            if(bool_exp){
+                buff_exp = get_number(&i, param);
+                printf("la potenza vale: %f\n", buff_exp);
+                printf("la x vale: %f\n", buff_var);
                 buff_var = pow(buff_var, buff_exp);
-                bool_exp = 0;
+                printf("la potenza vale: %f\n", buff_var);
             } else {
-                buff_number = atof(&param->function[i]);
+                buff_number = get_number(&i, param);
+                printf("il numero vale: %f\n", buff_number);
             }
+            
+            bool_exp = 0;
             break;
 
         case '^':
@@ -136,40 +164,120 @@ float compute_function(initial_variable *param){
             break;
 
         case '+':
-            if(!sub) {
-                ris += buff_number * buff_var;
-            } else {
-                ris -= buff_number * buff_var;
-            }
-            sub = 0;
+
+            get_ris(&bool_sub, &bool_fraction, &ris, &buff_fraction, &buff_number, &buff_var);
+
             buff_var = 1;
             buff_number = 1;
+
+            bool_exp = 0;
+
             break;
 
         case '-':
-            if(!sub) {
-                ris += buff_number * buff_var;
-            } else {
-                ris -= buff_number * buff_var;
-            }
+
+            get_ris(&bool_sub, &bool_fraction, &ris, &buff_fraction, &buff_number, &buff_var);
             
-            sub = 1;
-            buff_var = 1;
+            bool_sub = 1;
+            bool_exp = 0;
+
+            
+            break;
+
+        case '/': 
+
+            bool_fraction = 1;
+            bool_exp = 0;
+
+            buff_fraction = buff_number * buff_var;
             buff_number = 1;
+            buff_var = 1;
+            break;
+
+        case '(':
+
+
+            bool_brackets = 1;
+            bool_first_n = 0;
+            bool_exp = 0;
+            break;
+
+        case ')':
+
+
+            bool_brackets = 0;
+            bool_first_n = 0;
+            bool_exp = 0;
             break;
 
         default:
-            puts("\tnot recognised\n");
+            puts("\tNot recognised\n");
             break;
         }
     }
 
-    if(!sub) {
-        ris += buff_number * buff_var;
-    } else {
-        ris -= buff_number * buff_var;
-    }
-    printf("last ris is: %f\n", ris);
+    get_ris(&bool_sub, &bool_fraction, &ris, &buff_fraction, &buff_number, &buff_var);
+    printf("ris vale: %f\n", ris);
     return ris;
+}
+
+
+float get_ris(int *bool_sub, int *bool_fraction, float *ris, float *buff_fraction,
+        float *buff_number, float *buff_var) {
+    if(bool_sub[0]) {
+        if(bool_fraction[0]) {
+
+            ris[0] -= buff_fraction[0] / (buff_number[0] * buff_var[0]);
+
+            bool_fraction[0] = 0;
+                
+            buff_fraction[0] = 1;
+
+
+        } else {
+            ris[0] -= buff_number[0] * buff_var[0];
+        }
+
+        bool_sub[0] = 0;
+            
+    } else {
+        if(bool_fraction) {
+
+            ris[0] += buff_fraction[0] / (buff_number[0] * buff_var[0]);
+
+            bool_fraction[0] = 0;
+            
+            buff_fraction[0] = 1;
+
+        } else {
+            ris[0] += buff_number[0] * buff_var[0];
+        }
+    }
+
+    buff_var[0] = 1;
+    buff_number[0] = 1;
+
+    return ris[0];
+}
+
+
+
+float get_number(int *i, initial_variable *param){
+    float number = atof(&param->function[i[0]]);
+    int count = 0;
+
+    for(int j = i[0]+1 ; j < param->size; j++) {
+        if(param->function[j] == 'x' || param->function[j] == '^' || param->function[j] == '/' || 
+        param->function[j] == '(' || param->function[j] == ')' || param->function[j] == '+' || param->function[j] == '-'){
+            break;
+        } else {
+            number = number + atof(&param->function[j]);
+        }
+
+        count++;
+    }
+
+    i[0] += count;
+    return number;
 }
 
