@@ -7,15 +7,15 @@ SFLAGS = -Wall
 FUNC = functions.c
 
 MAINSEQ = falsi_seq.c
-OUTSEQ = falsi_seq
+OUTSEQ = ./falsi_seq
 
 MAINP = falsi_par.c
-OUTP = falsi_par
+OUTP = ./falsi_par
 
 
 # Qui vanno inseriti i flag per il run 
 # Ad esempio se si vogliono usare più processori di quelli disponibili --oversubscribe -n numero_dei_processi
-RUNFLAGS = --oversubscribe -n 
+RUNFLAGS = -n
 
 list:
 	./comand_list.sh
@@ -24,19 +24,19 @@ install:
 	sudo apt install mpich
 
 compile: 
-	mpicc $(PFLAGS) $(MAINP) $(FUNC) -o $(MAINO) -lm
+	mpicc $(PFLAGS) $(FUNC) $(MAINP) -o $(OUTP) -lm
 
 compile-seq:
 	gcc $(SFLAGS) $(MAINSEQ) $(FUNC) -o $(OUTSEQ) -lm -ggdb
 
 run-seq-pres:
-	./$(OUTSEQ) -x0 -0 -x1 3 -e 0.0003 -f function.txt
+	./$(OUTSEQ) -x0 0 -x1 3 -e 0.0003 -f function.txt
 	
 run: 
-	mpiexec $(RUNFLAGS) $(N) $(MAINO) $(PARAMS)
+	mpiexec $(RUNFLAGS) $(N) $(OUTP) $(PARAMS)
 
 run-pres:
-	mpiexec $(RUNFLAGS) 5 $(MAINO)
+	mpiexec $(RUNFLAGS) 5 $(OUTP) -x0 0 -x1 3 -e 0.0003 -f function.txt
 
 clean:
 	rm $(OUTSEQ) $(OUTP) 2>/dev/null

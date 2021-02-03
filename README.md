@@ -5,7 +5,7 @@
 
 # Usage
 
-In the Makefile you can choose about compiling running and deleting obsolete files. Is aviable a sequential version of software which can be runned without any installation and a parallel version where you need to install a software that is aviable in Makefile as make install (now aviable only for ubuntu but you have to install manually mpich)
+In the Makefile you can choose about compiling running and deleting obsolete files. Is available a sequential version of software which can be runned without any installation and a parallel version where you need to install a software that is available in Makefile as make install (now aviable only for ubuntu but you have to install manually mpich)
 
 - make compile to compile parallel version
 - make compile-seq to compile sequential version
