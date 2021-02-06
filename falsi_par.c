@@ -21,11 +21,6 @@ int main(int argc, char* argv[]) {
     int rank;
     int p;
 
-    int size = 0;
-
-    int n = 10;
-    int vector_size;
-
     int *displacement;
     int *count;
 
@@ -48,6 +43,9 @@ int main(int argc, char* argv[]) {
     
     displacement =  (int *) calloc(p, sizeof(int));
     count =         (int *) calloc(p, sizeof(int));
+
+    results =       (float *) calloc(p, sizeof(float));
+    null_checks =   (int *) calloc(p, sizeof(int));
     
     int step = 1;
     int max_steps;
@@ -76,9 +74,6 @@ int main(int argc, char* argv[]) {
                 displacement[i] = i;
             }
         }
-
-        results = (float *) calloc(p, sizeof(float));
-        null_checks = (int *) calloc(p, sizeof(int));
     }
 
 
@@ -131,13 +126,14 @@ int main(int argc, char* argv[]) {
     if(rank == 0) {
         float *final_result;
         int *check_final_result;
-        int max_roots = detect_max_roots(vars);
-        // TODO trovare quando deve essere grande
+        int max_roots; 
+        
+        max_roots = detect_max_roots(vars);
 
         final_result =          (float *) calloc(max_roots, sizeof(float));
         check_final_result =    (int *) calloc(max_roots, sizeof(int));
         
-        float buff_result = 0;
+        int result_position = 0;
         int result_found = 0;
 
         for(int i = 0; i < p; i++) {
@@ -148,29 +144,37 @@ int main(int argc, char* argv[]) {
                 } else {
                     for(int k = 0; k < max_roots; k++){
                         if(abs(results[i] - final_result[k]) > vars->e && check_final_result[k]) {
-                            buff_result = results[i];
+                            result_found = 1;
                         }
                         if (!check_final_result[k]) {
-                            result_found = k;
+                            result_position = k;
                             break;
                         }
                         
                     }
-                    if(result_found != 0) {
-                        final_result[result_found] = results[i];
+                    if(result_found) {
+                        final_result[result_position] = results[i];
                         result_found = 0;
                     }
                 }
             }
         }
 
+        puts("The system found roots at: ");
         for(int i = 0; i < max_roots; i++) {
-                printf("rank: %d ha dato come risultato %f\n", i, final_result[i]);
+            printf("%f\t", final_result[i]);
         }
+        printf("\nwith an error of %f\n", vars->e);
+
+        // free(final_result);
+        free(check_final_result);
     }
 
-    // free(vars);
+    free(vars);
     free(func);
+    free(null_checks);
+    free(displacement);
+    free(intervalls);
     MPI_Finalize();
     return 0;
 

@@ -26,8 +26,6 @@ int check_variable(char var, int *variable);
 
 void get_check_variable(int *variable, int number);
 
-int detect_max_roots(initial_variable *vars);
-
 
 /**
  * Compute function return back the value of the function written in function.txt. It manages different kind of exception
