@@ -390,9 +390,9 @@ float get_ris(int *bool_sub, int *bool_fraction, float ris, float *buff_fraction
 
             new_ris = ris - *buff_fraction / (*buff_number * *buff_var);
             
-            bool_fraction = 0;
+            *bool_fraction = 0;
                 
-            buff_fraction = 1;
+            *buff_fraction = 1;
 
 
         } else {
