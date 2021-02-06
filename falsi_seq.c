@@ -1,7 +1,16 @@
 #include "functions.h"
 
-#define f(x) pow(x,3)+2*pow(x,2)-5*x-2
-
+/**
+ * Falsi_seq.c File
+ * 
+ * Created by Davide Basile student at University of Salento
+ * 
+ * Project related to Parallel Algorithms exam
+ * 
+ * This file contain the sequential version of the falsi method is needed to compare the sequential version 
+ * to the parallel one
+ * 
+ */
 
 int main (int argc, char* argv[]) {
 
@@ -24,8 +33,6 @@ int main (int argc, char* argv[]) {
 
     vars = get_parameters(argc, argv);
 
-    printf("Function found by main in: %s\n", vars->function);
-
 
     /**
      * Initialize remaining variables
@@ -42,8 +49,6 @@ int main (int argc, char* argv[]) {
     /**
      * Starting the program
      */
-	printf("\nStep\t\tx0\t\tx1\t\tx2\t\tf(x2)\n");
-
     for(int i=0; i < max_steps; i++) {
     
 	    vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);

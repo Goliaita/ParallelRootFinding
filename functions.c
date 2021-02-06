@@ -3,10 +3,19 @@
 #define pf printf("siamo nel file %s, alla riga %d, nella funzione %s\n", __FILE__, __LINE__, __FUNCTION__);
 
 
-
+/**
+ * Function.c File
+ * 
+ * Created by Davide Basile student at University of Salento
+ * 
+ * Project related to Parallel Algorithms exam
+ * 
+ * This file contains how the function is computed and all stuff needed related to the function
+ * 
+ */
 
 /**
- * Support function
+ * Function declaration
  */
 float get_ris(int *bool_sub, int *bool_fraction,float ris, float *buff_fraction,
         float *buff_number, float *buff_var);
@@ -14,112 +23,16 @@ float get_ris(int *bool_sub, int *bool_fraction,float ris, float *buff_fraction,
 float get_number(int *i, initial_variable *param, int *variable);
 
 int check_variable(char var, int *variable);
+
 void get_check_variable(int *variable, int number);
 
 int detect_max_roots(initial_variable *vars);
 
 
-
-
 /**
- * Function that manage the parameters sent by command line
- * -x0 get the lower bound constraint (float)
- * -x1 get the upper bound constraint (float)
- * -e  get the error which generate a guess of the solution (float)
- * -f  get the file [if is in another folder include the path] of the function which we need to find roots (char *)
- * -a  let to the algorithm to compute contraint except error
+ * Compute function return back the value of the function written in function.txt. It manages different kind of exception
+ * giving back the exact result if it exists and returning back an exit if something went wrong
  */
-
-initial_variable *get_parameters(int argc, char* argv[]) {
-
-    initial_variable *params;
-
-    params = malloc(sizeof(initial_variable));
-    params->auto_choose = 0;
-
-    FILE *fp;
-
-    char line[50];
-
-    int check = 0;
-
-    if(argc > 1) {
-        for(int i=0; i<argc; i++) {
-            if(strcmp(argv[i],"-x0") == 0) {
-
-                check = 1;
-                params->x0 = atof(argv[i+1]);
-
-            } else if(strcmp(argv[i], "-x1") == 0) {
-
-                check = 1;
-                params->x1 = atof(argv[i+1]);
-
-            } else if(strcmp(argv[i], "-e") == 0) {
-
-                params->e = atof(argv[i+1]); 
-
-            } else if(strcmp(argv[i], "-f") == 0) {
-
-                fp = fopen(argv[i+1], "r");
-
-                if(!fp) {
-                    perror("Error while opening the file->\n");
-                    exit(1);
-                }
-
-                if(fgets(line, sizeof(line), fp)) {
-                    int k = 0;
-                    for(int j = 0; line[j]; j++) {
-                        line[j] = line[j+k];
-                        if(line[j] == ' ' || line[j] == '\t' || line[j] == '\n') {
-                            k++;
-                            j--;
-                        }
-                    }
-
-                    // printf("Function found is: %s\n", line);
-                    params->size = strlen(line);
-                    params->function = malloc(params->size * sizeof(char));
-                    strcpy(params->function,line); 
-                    printf("string lenght found %d\n", params->size);
-                }
-
-                fclose(fp);
-
-            } else if(strcmp(argv[i], "-a") == 0) {
-
-                params->auto_choose = 1;
-
-            } else if(strcmp(argv[i], "-h") == 0) {
-
-                printf("Usage -x0 [smallest bound], -x1 [higher bound], -e [error tollerance],\n");
-                printf("\t-f [path to file which contain the function to compute], -a autocompute constraints\n");
-                printf("\tif no element passed default value are: -x0=-2; -x1=2 e=0->001\n");
-
-                //TODO List errors that could be encountered
-
-            }
-        }
-    }
-
-    if(params->x0 > params->x1) {
-
-        puts("Warning x1 e' minore di x0 sono stati scambiati\n");
-
-        params->x0 += params->x1;
-        params->x1 = params->x0 - params->x1;
-        params->x0 -= params->x1;
-
-    }
-    if(!(params->auto_choose&&check)) {
-        return params;
-    } else {
-        puts("sono diversi");
-        exit(1);
-    } 
-}
-
 
 float compute_function(initial_variable *param) {
 
@@ -360,9 +273,9 @@ float compute_function(initial_variable *param) {
                 break;
 
             default:
-                puts("\tNot recognised\t");
-                printf("%c\n", param->function[i]);
-                break;
+                puts("\tCharacter not recognised\t");
+                printf("\tthe unrecognised character is: \"%c\" ignored\n", param->function[i]);
+                exit(1);
         }
     }
 
@@ -383,6 +296,9 @@ float compute_function(initial_variable *param) {
 }
 
 
+/**
+ * Get_ris gives back the result of the function computated until this function is created
+ */
 float get_ris(int *bool_sub, int *bool_fraction, float ris, float *buff_fraction,
         float *buff_number, float *buff_var) {
 
@@ -425,6 +341,9 @@ float get_ris(int *bool_sub, int *bool_fraction, float ris, float *buff_fraction
 }
 
 
+/**
+ * Get_number gives back the entire number, jumping over it to the next non number character
+ */
 float get_number(int *i, initial_variable *param, int *variable) {
 
     float number = atof(&param->function[*i]);
@@ -446,6 +365,9 @@ float get_number(int *i, initial_variable *param, int *variable) {
 }
 
 
+/**
+ * Detect_max_roots as name suggest check all the function one time to compute the max number of the roots
+ */
 int detect_max_roots(initial_variable *vars) {
 
     int max_roots   = 0;
@@ -462,7 +384,9 @@ int detect_max_roots(initial_variable *vars) {
 }
 
 
-
+/**
+ * Check_variable check if the user inserted more than one variable in the function
+ */
 int check_variable(char var, int *variable) {
 
     int check = 1;

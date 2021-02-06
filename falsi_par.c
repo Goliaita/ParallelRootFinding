@@ -1,10 +1,17 @@
 #include <mpi.h>
 #include "functions.h"
 
-#define BLOCK_LOW(id, p, n)      ((id)*((n)/(p)))
-#define BLOCK_HIGH(id, p, n)    (BLOCK_LOW((id)+1, p, n) - 1)
-#define BLOCK_SIZE(id, p, n)    (BLOCK_HIGH(id, p, n) - BLOCK_LOW(id, p, n) + 1)
-#define BLOCK_OWNER(index, p, n)  (((p)*(index) + 1) -1) /(n))
+/**
+ * Falsi_Par.c File
+ * 
+ * Created by Davide Basile student at University of Salento
+ * 
+ * Project related to Parallel Algorithms exam
+ * 
+ * This file contain the parallel version about the root finding problem that is solved with 
+ * the falsi method which compute the function (x0f1 - x1f0) / (f1 - f0)
+ * 
+ */
 
 int main(int argc, char* argv[]) {
 
@@ -62,7 +69,7 @@ int main(int argc, char* argv[]) {
 
         } else {
             float partitioning = (vars->x1 - vars->x0) / p;
-            printf("partiamo da %f e arriviamo a %f\n", vars->x0, vars->x1);
+
             for(int i = 0; i <= p; i++) {
                 intervalls[i] = vars->x0 + i * partitioning;
                 count[i] = 2;
@@ -92,11 +99,11 @@ int main(int argc, char* argv[]) {
     /**
      * Starting the program
      */
-	// printf("\nStep\t\tx0\t\tx1\t\tx2\t\tf(x2)\n");
 
     for(int i=0; i < max_steps; i++) {
     
-	    vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);
+	    // vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);
+        vars->xs = (vars->x0 * func->f1 - vars->x1 * func->f0)/(func->f1 - func->f0);
 		func->fs = compute_function(vars);
 		
 		if(func->f0*func->fs < 0) {
