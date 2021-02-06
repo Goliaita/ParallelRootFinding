@@ -14,6 +14,10 @@ float get_ris(int *bool_sub, int *bool_fraction,float ris, float *buff_fraction,
 float get_number(int *i, initial_variable *param, int *variable);
 
 int check_variable(char var, int *variable);
+void get_check_variable(int *variable, int number);
+
+int detect_max_roots(initial_variable *vars);
+
 
 
 
@@ -68,7 +72,6 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                     int k = 0;
                     for(int j = 0; line[j]; j++) {
                         line[j] = line[j+k];
-                        // printf("%c", line[])
                         if(line[j] == ' ' || line[j] == '\t' || line[j] == '\n') {
                             k++;
                             j--;
@@ -424,10 +427,10 @@ float get_ris(int *bool_sub, int *bool_fraction, float ris, float *buff_fraction
 
 float get_number(int *i, initial_variable *param, int *variable) {
 
-    float number = atof(&param->function[i[0]]);
+    float number = atof(&param->function[*i]);
     int count = 0;
 
-    for(int j = *i+1 ; j < param->size; j++) {
+    for(int j = *i++ ; j < param->size; j++) {
         if(check_variable(param->function[j], variable) || param->function[j] == '^' || param->function[j] == '/' || 
         param->function[j] == '(' || param->function[j] == ')' || param->function[j] == '+' || param->function[j] == '-'){
             break;
@@ -442,244 +445,142 @@ float get_number(int *i, initial_variable *param, int *variable) {
     return number;
 }
 
+
+int detect_max_roots(initial_variable *vars) {
+
+    int max_roots   = 0;
+    int variable    = 0;
+
+    for(int i = 0; i < vars->size; i++) {
+        switch(vars->function[i]) {
+            case '^':
+                i++;
+                max_roots = (int) get_number(&i, vars, &variable);
+        }
+    }
+    return max_roots;
+}
+
+
+
 int check_variable(char var, int *variable) {
 
     int check = 1;
 
     switch(var) {
         case 'a':
-            if(*variable == 0) {
-                *variable = 1;
-            } else if(*variable != 1) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 1);
             break;
 
         case 'b':
-            if(*variable == 0) {
-                *variable = 2;
-            } else if(*variable != 2) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 2);
             break;
 
         case 'c':
-            if(*variable == 0) {
-                *variable = 3;
-            } else if(*variable != 3) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 3);
             break;
 
         case 'd':
-            if(*variable == 0) {
-                *variable = 4;
-            } else if(*variable != 4) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 4);
             break;
 
         case 'e':
-            if(*variable == 0) {
-                *variable = 5;
-            } else if(*variable != 5) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 5);
             break;
 
         case 'f':
-            if(*variable == 0) {
-                *variable = 6;
-            } else if(*variable != 6) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 6);
             break;
 
         case 'g':
-            if(*variable == 0) {
-                *variable = 7;
-            } else if(*variable != 7) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 7);
             break;
 
         case 'h':
-            if(*variable == 0) {
-                *variable = 8;
-            } else if(*variable != 8) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 8);
             break;
 
         case 'i':
-            if(*variable == 0) {
-                *variable = 9;
-            } else if(*variable != 9) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 9);
             break;
 
         case 'j':
-            if(*variable == 0) {
-                *variable = 10;
-            } else if(*variable != 10) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 10);
             break;
 
         case 'k':
-            if(*variable == 0) {
-                *variable = 11;
-            } else if(*variable != 11) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 11);
             break;
 
         case 'l':
-            if(*variable == 0) {
-                *variable = 12;
-            } else if(*variable != 12) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 12);
             break;
 
         case 'm':
-            if(*variable == 0) {
-                *variable = 13;
-            } else if(*variable != 13) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 13);
             break;
 
         case 'n':
-            if(*variable == 0) {
-                *variable = 14;
-            } else if(*variable != 14) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 14);
             break;
 
         case 'o':
-            if(*variable == 0) {
-                *variable = 15;
-            } else if(*variable != 15) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 15);
             break;
 
         case 'p':
-            if(*variable == 0) {
-                *variable = 16;
-            } else if(*variable != 16) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 16);
             break;
 
         case 'q':
-            if(*variable == 0) {
-                *variable = 17;
-            } else if(*variable != 17) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 17);
             break;
 
         case 'r':
-            if(*variable == 0) {
-                *variable = 18;
-            } else if(*variable != 18) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 18);
             break;
 
         case 's':
-            if(*variable == 0) {
-                *variable = 19;
-            } else if(*variable != 19) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 19);
             break;
 
         case 't':
-            if(*variable == 0) {
-                *variable = 20;
-            } else if(*variable != 20) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 20);
             break;
 
         case 'u':
-            if(*variable == 0) {
-                *variable = 21;
-            }else if(*variable != 21) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 21);
             break;
 
         case 'v':
-            if(*variable == 0) {
-                *variable = 22;
-            } else if(*variable != 22) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 22);
             break;
 
         case 'w':
-            if(*variable == 0) {
-                *variable = 23;
-            } else if(*variable != 23) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 23);
             break;
 
         case 'x':
-            if(*variable == 0) {
-                *variable = 24;
-            } else if(*variable != 24) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 24);
             break;
 
         case 'y':
-            if(*variable == 0) {
-                *variable = 25;
-            } else if(*variable != 25) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 25);
             break;
 
         case 'z':
-            if(*variable == 0) {
-                *variable = 26;
-            } else if(*variable != 26) {
-                puts("Error inserted more than one variable check function and write it with only one variable");
-                exit(1);
-            }
+            get_check_variable(variable, 26);
             break;
     }
     return check;
+}
+
+
+void get_check_variable(int *variable, int number) {
+    if(*variable == 0) {
+        *variable = number;
+    } else if(*variable != number) {
+        puts("Error inserted more than one variable check function and write it with only one variable");
+        exit(1);
+    }
 }
