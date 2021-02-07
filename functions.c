@@ -375,7 +375,8 @@ int detect_max_roots(initial_variable *vars) {
         switch(vars->function[i]) {
             case '^':
                 i++;
-                max_roots = (int) get_number(&i, vars, &variable);
+                int buff =  (int) get_number(&i, vars, &variable);
+                if(buff > max_roots) max_roots = buff;
         }
     }
     return max_roots;

@@ -129,6 +129,7 @@ int main(int argc, char* argv[]) {
         int max_roots; 
         
         max_roots = detect_max_roots(vars);
+        printf("max roots found: %d\n", max_roots);
 
         final_result =          (float *) calloc(max_roots, sizeof(float));
         check_final_result =    (int *) calloc(max_roots, sizeof(int));
@@ -158,6 +159,9 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
+        }
+        for(int i = 0; i < p; i++) {
+            printf("trovati i seguenti root: %d ha trovato %f\n", i, results[i]);
         }
 
         puts("The system found roots at: ");

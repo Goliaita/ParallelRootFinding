@@ -4,7 +4,7 @@ PFLAGS = -O3 -Wall
 SFLAGS = -Wall 
 
 # Qui andranno i file .c da compilare con il relativo nome di output
-FUNC = functions.c
+FUNC = functions.c read_input.c
 
 MAINSEQ = falsi_seq.c
 OUTSEQ = ./falsi_seq
@@ -36,7 +36,7 @@ run:
 	mpiexec $(RUNFLAGS) $(N) $(OUTP) $(PARAMS)
 
 run-pres:
-	mpiexec $(RUNFLAGS) 5 $(OUTP) -x0 0.5 -x1 3 -e 0.0003 -f function.txt
+	mpiexec $(RUNFLAGS) 6 $(OUTP) -x0 -5 -x1 -0.1 -e 0.0003 -f function.txt
 
 clean:
 	rm $(OUTSEQ) $(OUTP) 2>/dev/null
