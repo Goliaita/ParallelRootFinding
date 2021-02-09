@@ -36,7 +36,7 @@ run:
 	mpiexec $(RUNFLAGS) $(N) $(OUTP) $(PARAMS)
 
 run-pres:
-	mpiexec $(RUNFLAGS) 30 $(OUTP) -x0 -3 -x1 3 -e 0.0003 -f exp
+	mpiexec $(RUNFLAGS) 4 $(OUTP) -x0 -10 -x1 40 -e 0.00000001 -f exp
 
 clean:
 	rm $(OUTSEQ) $(OUTP) 2>/dev/null

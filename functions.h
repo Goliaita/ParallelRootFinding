@@ -16,22 +16,15 @@
  */
 
 typedef struct {
-    float x0;           // lower bound
-    float x1;           // higher bound
-    float e;            // error
-    float xs;           // value of root
+    double x0;           // lower bound
+    double x1;           // higher bound
+    double e;            // error
+    double xs;           // value of root
     int auto_choose;    // like a boolean
     // int size;        // lenght of function, used in old_function.c
     // char *function;  // string for the function definition
     char *function;     // string in which you need to identify the function you want to use 
 } initial_variable;
-
-typedef struct {
-    float f0;           // value of the function at x0
-    float f1;           // value of the function at x1
-    float fs;           // value of the function at next step
-} functions;
-
 
 /**
  * Declaration of functions

@@ -13,6 +13,11 @@
  * 
  */
 
+void compute_roots(int max_steps, initial_variable *vars, int *step, double *result, int *null_check);
+
+
+
+
 int main(int argc, char* argv[]) {
 
 
@@ -24,34 +29,36 @@ int main(int argc, char* argv[]) {
     int *displacement;
     int *count;
 
-    float intervall[2];
-    float *intervalls;
+    double intervall[2];
+    double *intervalls;
 
-    float *results;
-    float result = 0;
+    double *results;
+    double *collect_results;
 
-    int null_check = 1;
-    int *null_checks;
+    int *check_results;
+    int *results_found;
 
-    functions *func;
+    int total_results = 0;
+
+    
     initial_variable *vars;
 
-    func =          (functions *) malloc(sizeof(functions));
-    vars =          (initial_variable *) malloc(sizeof(initial_variable));
+    MPI_Comm_size(MPI_COMM_WORLD, &p);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);    
 
-    intervalls =    (float *) calloc(2*p, sizeof(float));
+    vars            = (initial_variable *) malloc(sizeof(initial_variable));
+
+    intervalls      = (double *) calloc(2*p, sizeof(double));
     
-    displacement =  (int *) calloc(p, sizeof(int));
-    count =         (int *) calloc(p, sizeof(int));
+    displacement    = (int *) calloc(p, sizeof(int));
+    count           = (int *) calloc(p, sizeof(int));
 
-    results =       (float *) calloc(p, sizeof(float));
-    null_checks =   (int *) calloc(p, sizeof(int));
+    // results =       (double *) calloc(p, sizeof(double));
+    results_found   = (int *) calloc(p, sizeof(int));
     
     int step = 1;
     int max_steps;
 
-    MPI_Comm_size(MPI_COMM_WORLD, &p);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);    
 
     vars = get_parameters(argc, argv);
 
@@ -66,7 +73,7 @@ int main(int argc, char* argv[]) {
         if(vars->auto_choose) {
 
         } else {
-            float partitioning = (vars->x1 - vars->x0) / p;
+            double partitioning = (vars->x1 - vars->x0) / p;
 
             for(int i = 0; i <= p; i++) {
                 intervalls[i] = vars->x0 + i * partitioning;
@@ -76,110 +83,141 @@ int main(int argc, char* argv[]) {
         }
     }
 
-
-    // MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Scatterv(intervalls, count, displacement, MPI_FLOAT, intervall, 2, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    
     MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Scatterv(intervalls, count, displacement, MPI_DOUBLE, intervall, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     vars->x0 = intervall[0];
     vars->x1 = intervall[1];    
 
-    vars->xs = vars->x0;
-	func->f0 = compute_function(vars);
-    
-    vars->xs = vars->x1;
-	func->f1 = compute_function(vars);
-
-
     /**
-     * Starting the program
+     * Starting the computation
      */
 
-    for(int i=0; i < max_steps; i++) {
+    double max_intervalls = (vars->x1-vars->x0)/vars->e;
+
+    intervalls      = (double *) calloc(max_intervalls, sizeof(double));
+    results         = (double *) calloc(max_intervalls - 1, sizeof(double));
+    check_results   = (int *) calloc(max_intervalls - 1, sizeof(int));
+
     
-	    // vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);
-        vars->xs = (vars->x0 * func->f1 - vars->x1 * func->f0)/(func->f1 - func->f0);
-		func->fs = compute_function(vars);
-		
-		if(func->f0*func->fs < 0) {
-			vars->x1 = vars->xs;
-		    func->f1 = func->fs;
-		} else {
-			vars->x0 = vars->xs;
-			func->f0 = func->fs;
-		}
-		step = step + 1;
-
-        if(fabs(func->fs)<vars->e) {
-            result = vars->xs;
-            null_check = 0;
-            break;
-        }
-
+    for(int i = 0; i < max_intervalls; i++) {
+        intervalls[i] = vars->x0 + i * vars->e;
     }
 
-    MPI_Gather(&null_check, 1, MPI_INT, null_checks, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Gather(&result, 1, MPI_FLOAT, results, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    for(int i = 0; i < max_intervalls - 1; i++) {
+        vars->x0 = intervalls[i];
+        vars->x1 = intervalls[i+1];
+        compute_roots(max_steps, vars, &step, &results[i], &check_results[i]);
+    }
 
-    MPI_Barrier(MPI_COMM_WORLD);  
+    /**
+     * End computation
+     */
+
+    free(intervalls);
+
+    /**
+     * Start collecting data
+     */
+
+    int result_found = 0;
+    for(int i = 0; i < max_intervalls - 1; i++) {
+        result_found += check_results[i];
+    }
+
+    double *buff_res = (double *) calloc(result_found, sizeof(double));
+
+    int k = 0;
+    for(int i = 0; i < max_intervalls - 1; i++) {
+        if(check_results[i]) {
+            buff_res[k] = results[i];
+            k++;
+        }
+    }
+
+    for(int i = 0; i < result_found; i++) printf("%d trova: %lf\n", rank, buff_res[i]);
+
+    free(results);
+    free(check_results);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Gather(&result_found, 1, MPI_INT, results_found, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     if(rank == 0) {
-        float *final_result;
-        int *check_final_result;
-        int max_roots; 
         
-        max_roots = detect_max_roots(vars);
-        printf("max roots found: %d\n", max_roots);
-
-        final_result =          (float *) calloc(max_roots, sizeof(float));
-        check_final_result =    (int *) calloc(max_roots, sizeof(int));
-        
-        int result_position = 0;
-        int result_found = 0;
-
         for(int i = 0; i < p; i++) {
-            if(!null_checks[i]) {
-                if(i == 0) {
-                    final_result[i] = results[i];
-                    check_final_result[i] = 1;
-                } else {
-                    for(int k = 0; k < max_roots; k++){
-                        if(abs(results[i] - final_result[k]) > vars->e && check_final_result[k]) {
-                            result_found = 1;
-                        }
-                        if (!check_final_result[k]) {
-                            result_position = k;
-                            break;
-                        }
-                        
-                    }
-                    if(result_found) {
-                        final_result[result_position] = results[i];
-                        result_found = 0;
-                    }
-                }
-            }
-        }
-        for(int i = 0; i < p; i++) {
-            printf("trovati i seguenti root: %d ha trovato %f\n", i, results[i]);
+            total_results += results_found[i];
         }
 
-        puts("The system found roots at: ");
-        for(int i = 0; i < max_roots; i++) {
-            printf("%f\t", final_result[i]);
-        }
-        printf("\nwith an error of %f\n", vars->e);
+        displacement[0] = 0;
 
-        // free(final_result);
-        free(check_final_result);
+        for(int i = 1; i < p; i++) {
+            
+            printf("il rank %d ha passato %d risultati\n", rank, count[i]);
+            displacement[i] = displacement[i-1] + results_found[i-1];
+        }
     }
 
-    free(vars);
-    free(func);
-    free(null_checks);
+    collect_results = (double *) calloc(total_results, sizeof(float));
+
+    MPI_Barrier(MPI_COMM_WORLD); 
+
+    MPI_Gatherv(buff_res, 1, MPI_DOUBLE, collect_results, results_found, displacement, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
     free(displacement);
-    free(intervalls);
-    MPI_Finalize();
+    free(count);
+    free(buff_res);
+
+
+    if(rank == 0) {
+        for(int i = 0; i < total_results; i++)
+            printf("trovati i seguenti root rank: %d ha trovato %lf\n", i, collect_results[i]);
+
+        printf("with an error of %lf\n", vars->e);
+
+    }
+
+    free(collect_results);
+    free(vars);
     return 0;
 
+}
+
+
+void compute_roots(int max_steps, initial_variable *vars, int *step, double *result, int *check_res) {
+
+    double f0, f1, fs;
+
+    vars->xs = vars->x0;
+    f0 = compute_function(vars);
+
+    vars->xs = vars->x1;
+    f1 = compute_function(vars);
+
+    if(f0*f1 <= 0) {
+        for(int i=0; i < max_steps; i++) {
+        
+            // vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);
+            vars->xs = (vars->x0 * f1 - vars->x1 * f0)/(f1 - f0);
+            fs = compute_function(vars);
+            
+            if(f0*fs < 0) {
+                vars->x1 = vars->xs;
+                f1 = fs;
+            } else {
+                vars->x0 = vars->xs;
+                f0 = fs;
+            }
+            *step = *step + 1;
+
+            if(fabs(fs)<vars->e) {
+                *check_res = 1;
+                *result = vars->xs;
+                break;
+            }
+        }
+    } else {
+        *check_res = 0;
+    }
 }

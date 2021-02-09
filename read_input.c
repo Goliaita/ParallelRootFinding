@@ -99,7 +99,6 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                } else {
                    get_usage();
                }
-               printf("we got %s\n", params->function);
 
             } else if(strcmp(argv[i], "-a") == 0) {
 
