@@ -14,7 +14,7 @@ OUTP = ./falsi_par
 
 
 # Qui vanno inseriti i flag per il run 
-# Ad esempio se si vogliono usare più processori di quelli disponibili --oversubscribe -n numero_dei_processi
+# Ad esempio se si vogliono usare più processori di quelli disponibili -n numero_dei_processi
 RUNFLAGS = -n
 
 list:
@@ -30,13 +30,13 @@ compile-seq:
 	gcc $(SFLAGS) $(MAINSEQ) $(FUNC) -o $(OUTSEQ) -lm -ggdb
 
 run-seq-pres:
-	./$(OUTSEQ) -x0 0 -x1 3 -e 0.0003 -f function.txt
+	./$(OUTSEQ) -x0 -1 -x1 3 -e 0.0003 -f exp
 	
 run: 
 	mpiexec $(RUNFLAGS) $(N) $(OUTP) $(PARAMS)
 
 run-pres:
-	mpiexec $(RUNFLAGS) 6 $(OUTP) -x0 -5 -x1 -0.1 -e 0.0003 -f function.txt
+	mpiexec $(RUNFLAGS) 30 $(OUTP) -x0 -3 -x1 3 -e 0.0003 -f exp
 
 clean:
 	rm $(OUTSEQ) $(OUTP) 2>/dev/null

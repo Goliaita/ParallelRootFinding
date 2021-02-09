@@ -21,8 +21,9 @@ typedef struct {
     float e;            // error
     float xs;           // value of root
     int auto_choose;    // like a boolean
-    int size;           // lenght of function 
-    char *function;     // string for the function definition
+    // int size;        // lenght of function, used in old_function.c
+    // char *function;  // string for the function definition
+    char *function;     // string in which you need to identify the function you want to use 
 } initial_variable;
 
 typedef struct {
@@ -36,7 +37,6 @@ typedef struct {
  * Declaration of functions
  */
 initial_variable *get_parameters(int argc, char* argv[]);
-float compute_function(initial_variable *param);
-int detect_max_roots(initial_variable *vars);
+double compute_function(initial_variable *param);
 
 

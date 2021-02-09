@@ -32,7 +32,7 @@ void get_check_variable(int *variable, int number);
  * giving back the exact result if it exists and returning back an exit if something went wrong
  */
 
-float compute_function(initial_variable *param) {
+double compute_function(initial_variable *param) {
 
     float buff_number       = 1;
     float buff_exp          = 1;
@@ -58,9 +58,9 @@ float compute_function(initial_variable *param) {
     int bool_b_sub          = 0;
     int bool_b_close        = 0;
 
+    int size                = 0; // to use this variable have to uncomment line 24 and change size to the one in comment
 
-
-    for(int i = 0; i<param->size; i++) {
+    for(int i = 0; i < size /* param->size */; i++) {
         switch(param->function[i]) {
             case 'a':
             case 'b':
@@ -344,10 +344,11 @@ float get_ris(int *bool_sub, int *bool_fraction, float ris, float *buff_fraction
  */
 float get_number(int *i, initial_variable *param, int *variable) {
 
-    float number = atof(&param->function[*i]);
-    int count = 0;
+    float number    = atof(&param->function[*i]);
+    int count       = 0;
+    int size        = 0;
 
-    for(int j = *i++ ; j < param->size; j++) {
+    for(int j = *i++ ; j < size /* param->size */; j++) {
         if(check_variable(param->function[j], variable) || param->function[j] == '^' || param->function[j] == '/' || 
         param->function[j] == '(' || param->function[j] == ')' || param->function[j] == '+' || param->function[j] == '-'){
             break;
@@ -370,8 +371,9 @@ int detect_max_roots(initial_variable *vars) {
 
     int max_roots   = 0;
     int variable    = 0;
+    int size        = 0;
 
-    for(int i = 0; i < vars->size; i++) {
+    for(int i = 0; i < size /* vars->size */; i++) {
         switch(vars->function[i]) {
             case '^':
                 i++;
