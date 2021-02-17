@@ -53,10 +53,15 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                 check = 1;
                 params->x1 = atof(argv[i+1]);
 
-            } else if(strcmp(argv[i], "-e") == 0) {
+            } else if(strcmp(argv[i], "-fe") == 0) {
 
                 check_character(argv[i+1]);
-                params->e = atof(argv[i+1]); 
+                params->fe = atof(argv[i+1]); 
+
+            } else if(strcmp(argv[i], "-ie") == 0) {
+
+                check_character(argv[i+1]);
+                params->ie = atof(argv[i+1]); 
 
             } else if(strcmp(argv[i], "-f") == 0) {
                 /*
@@ -94,7 +99,7 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                    params->function = argv[i+1];
                } else if(strcmp(argv[i+1], "log") == 0) {
                     params->function = argv[i+1];
-               } else if(strcmp(argv[i+1], "log") == 0) {
+               } else if(strcmp(argv[i+1], "frac") == 0) {
                     params->function = argv[i+1];
                } else {
                    get_usage();
@@ -112,7 +117,7 @@ initial_variable *get_parameters(int argc, char* argv[]) {
 
     if(params->x0 > params->x1) {
 
-        puts("Warning x1 e' minore di x0 sono stati scambiati\n");
+        puts("Warning x1 is less than x0 swapped\n");
 
         params->x0 += params->x1;
         params->x1 = params->x0 - params->x1;
@@ -122,7 +127,7 @@ initial_variable *get_parameters(int argc, char* argv[]) {
     if(!(params->auto_choose&&check)) {
         return params;
     } else {
-        puts("sono diversi\n\n");
+        puts("Got -a and [-x0, -x1] setted chose one of them");
         get_usage();
         exit(1);
     } 
@@ -132,7 +137,7 @@ initial_variable *get_parameters(int argc, char* argv[]) {
 void get_usage() {
     puts("Usage -x0 [smallest bound], -x1 [higher bound], -e [error tollerance],");
     // puts("\t-f [path to file which contain the function to compute], -a autocompute constraints\n");
-    puts("\t-f [function to compute \"exp\", \"log\", \"fraction\"], -a autocompute constraints");
+    puts("\t-f [function to compute \"exp\", \"log\", \"frac\"], -a autocompute constraints");
     puts("\tif no element passed default value are: -x0=-2; -x1=2 e=0->001");
     puts("\tThe default function is exp");
     //TODO List errors that could be encountered
