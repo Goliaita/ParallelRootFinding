@@ -29,7 +29,7 @@ double compute_function(initial_variable *param, double arg) {
     } else if(strcmp(param->function, "frac") == 0) {
         res = f_frac(param->xs);
     }
-    
+
     return res;
 }
 
@@ -47,7 +47,7 @@ double f_log(double var, double log_arg) {
 
 double f_frac(double var) {
     // (3x^3-5x)/(2x^2-5)
-    return (3 * pow(var,3) - max_num * var) / ;
+    return (3 * pow(var,3) - max_num * var) / denominator(var, max_num);
 }
 
 void compute_roots(int max_steps, initial_variable *vars, int *step, double *result, int *check_res, int *steps) {
