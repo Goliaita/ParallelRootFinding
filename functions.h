@@ -18,8 +18,7 @@
 typedef struct {
     double x0;          // lower bound
     double x1;          // higher bound
-    double ie;          // intervall error
-    double fe;          // function error
+    double p;           // precision of computation
     double xs;          // value of root
     int auto_choose;    // like a boolean
     // int size;        // lenght of function, used in old_function.c
@@ -31,9 +30,9 @@ typedef struct {
  * Function's declaration
  */
 initial_variable *get_parameters(int argc, char* argv[]);
-double compute_function(initial_variable *param);
+double compute_function(initial_variable *param, double log_arg);
 void compute_roots(int max_steps, initial_variable *vars, int *step, double *result, int *check_res, int *steps);
-void axis_partitioning(double min, double max, double error, double *intervalls);
+void axis_partitioning(double min, double max, int error, double *intervalls);
 double get_max_num();
 
 

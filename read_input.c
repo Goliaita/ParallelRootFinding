@@ -53,15 +53,10 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                 check = 1;
                 params->x1 = atof(argv[i+1]);
 
-            } else if(strcmp(argv[i], "-fe") == 0) {
+            } else if(strcmp(argv[i], "-p") == 0) {
 
                 check_character(argv[i+1]);
-                params->fe = atof(argv[i+1]); 
-
-            } else if(strcmp(argv[i], "-ie") == 0) {
-
-                check_character(argv[i+1]);
-                params->ie = atof(argv[i+1]); 
+                params->p = atof(argv[i+1]); 
 
             } else if(strcmp(argv[i], "-f") == 0) {
                 /*
@@ -135,7 +130,7 @@ initial_variable *get_parameters(int argc, char* argv[]) {
 
 
 void get_usage() {
-    puts("Usage -x0 [smallest bound], -x1 [higher bound], -e [error tollerance],");
+    puts("Usage -x0 [smallest bound], -x1 [higher bound], -p [precision of computation],");
     // puts("\t-f [path to file which contain the function to compute], -a autocompute constraints\n");
     puts("\t-f [function to compute \"exp\", \"log\", \"frac\"], -a autocompute constraints");
     puts("\tif no element passed default value are: -x0=-2; -x1=2 e=0->001");
