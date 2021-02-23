@@ -19,7 +19,7 @@ int main (int argc, char* argv[]) {
      */
     initial_variable *vars;
 
-    vars = (initial_variable *) malloc(sizeof(initial_variable));
+    FILE *fo;
     
     int step = 1;
     int max_steps;
@@ -29,6 +29,7 @@ int main (int argc, char* argv[]) {
 
     double max = get_max_num();
 
+    vars = (initial_variable *) malloc(sizeof(initial_variable));
 
     /**
      * Get information by command line
@@ -78,16 +79,13 @@ int main (int argc, char* argv[]) {
 
     }
 
+    if((fo = fopen("./results_seq.txt", "w+")) == NULL) {
+        perror("Error at opening file");
+    }
 
     for(int i = 0; i < max_intervalls; i++) {
-        if(check_results[i]) printf("roots found at: %lf\n", results[i]);
+        if(check_results[i]) fprintf(fo, "%s %lf\n", "roots found at:", results[i]);
     }
-    
-
-    /**
-     * Print the result
-     */
-    printf("\nRoot is: %f\n", vars->xs);
 
     return 0;
 }
