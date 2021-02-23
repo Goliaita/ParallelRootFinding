@@ -30,13 +30,13 @@ compile-seq:
 	gcc $(SFLAGS) $(MAINSEQ) $(FUNC) -o $(OUTSEQ) -lm -ggdb
 
 run-seq-pres:
-	$(OUTSEQ) -a  -p 0.000001 -f log
+	$(OUTSEQ) -a  -p 0.000001 -f sin
 	
 run: 
 	mpiexec $(RUNFLAGS) $(N) $(OUTP) $(PARAMS)
 
 run-pres:
-	mpiexec $(RUNFLAGS) 4 $(OUTP) -a -p 0.0001 -f sin
+	mpiexec $(RUNFLAGS) 4 $(OUTP) -x0 -1000 -x1 1000 -p 0.0001 -f sin
 
 clean:
 	rm $(OUTSEQ) $(OUTP) 2>/dev/null

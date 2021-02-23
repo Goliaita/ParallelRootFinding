@@ -1,5 +1,6 @@
 #include <mpi.h>
 #include "functions.h"
+#include <errno.h>
 
 /**
  * Falsi_Par.c File
@@ -37,6 +38,7 @@ int main(int argc, char* argv[]) {
 
     int total_results = 0;
 
+    FILE *fo;
     
     initial_variable *vars;
 
@@ -59,10 +61,13 @@ int main(int argc, char* argv[]) {
 
     max_steps = (int)(vars->x1 - vars->x0)/vars->p;    
     
-    double max = get_max_num();
-    
+    double max = get_max_num();    
 
     if(rank == 0){
+        if((fo = fopen("./results.txt", "w+")) == NULL) {
+            perror("fileopen");
+        }
+        fprintf(fo, "%s", "\n");
 
         /**
          * Check the entire system and create the split for all processes
@@ -117,7 +122,7 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < max_intervalls - 1; i++) {
         vars->x0 = intervalls[i];
         vars->x1 = intervalls[i+1];
-        if(intervalls[i] > -0.5 && intervalls[i+1] < -0.2) printf("rank %d ha intervalli [%lf, %lf]\n", rank, intervalls[i], intervalls[i+1]);
+        // if(intervalls[i] > -0.5 && intervalls[i+1] < -0.2) printf("rank %d ha intervalli [%lf, %lf]\n", rank, intervalls[i], intervalls[i+1]);
         
         int steps = 0;
 
@@ -181,17 +186,17 @@ int main(int argc, char* argv[]) {
     MPI_Gatherv(buff_res, result_found, MPI_DOUBLE, collect_results, results_found, displacement, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     free(displacement);
-    free(buff_res);
+    // free(buff_res);
     free(count);
 
-
+ 
     if(rank == 0) {
-        printf("\n\n");
-        for(int i = 0; i < total_results; i++)
-            printf("root found at %lf\n", collect_results[i]);
-
-        printf("\nwith an error of %lf\n", vars->p);
+        printf("\n");
+        for(int i = 0; i < total_results; i++){
+            fprintf(fo, "%s %s %s %lf\n","root", "found", "at", collect_results[i]);
+        }
     }
+    fflush(stdout);
 
     free(collect_results);
     free(vars);
