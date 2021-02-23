@@ -1,7 +1,8 @@
 #include "functions.h"
 
-#define log_argument(var, max_num)  (2 * var / max_num) + var
-#define denominator(var, max_num)   (2 * pow(var,2) - max_num)
+// #define log_argument(var, max_num)  (2 * var / max_num) + var
+#define log_argument(var, max_num)  3 * pow(var, 2) - max_num + 3 * pow(var, 3) - 32 * var
+#define denominator(var, max_num)   (2 * pow(var,2) + max_num)
 
 
 /**
@@ -9,11 +10,12 @@
  */
 double f_exp(double var);
 double f_log(double var, double log_arg);
-double f_frac(double var);
+double f_frac(double var, double den_arg);
+double f_sin(double var);
 
 
 
-double max_num = 5;  // Set here the max number of the funcion which have to be the value of the number not relatex to x
+double max_num = 43;  // Set here the max number of the funcion which have to be the value of the number not relatex to x
 
 
 double compute_function(initial_variable *param, double arg) {
@@ -27,7 +29,9 @@ double compute_function(initial_variable *param, double arg) {
         res = f_log(param->xs, arg);
 
     } else if(strcmp(param->function, "frac") == 0) {
-        res = f_frac(param->xs);
+        res = f_frac(param->xs, arg);
+    } else if(strcmp(param->function, "sin") == 0) {
+        res = f_sin(param->xs);
     }
 
     return res;
@@ -42,12 +46,20 @@ double f_exp(double var) {
 
 double f_log(double var, double log_arg) {
     // 2x-log(2x/5+x)-2
-    return 2 * var - log(log_arg) - 2;
+    // return 2 * var - log(log_arg) - 2;
+    // 3x^2+2x^5-log(3x+1)-43x^3-10+34x
+    return 3 * pow(var, 2) + 2 * pow(var, 5) - log(log_arg) - max_num * pow(var, 3) - 10 + 34 * var;
 }
 
-double f_frac(double var) {
+double f_frac(double var, double den_arg) {
     // (3x^3-5x)/(2x^2-5)
     return (3 * pow(var,3) - max_num * var) / denominator(var, max_num);
+}
+
+
+double f_sin(double var) {
+    // 3x^2*sin(2x+2)-4x-1
+    return 3 * pow(var, 2) * sin(2 * var + 2) - 4 * var - 1;
 }
 
 void compute_roots(int max_steps, initial_variable *vars, int *step, double *result, int *check_res, int *steps) {
@@ -65,28 +77,42 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
     if(strcmp(vars->function, "log") == 0 && log_argument(vars->x1, max_num) < 0) {
         *check_res = 0;
 
-    } else if(strcmp(vars->function, "frac") == 0 && 
-        (vars->x1 == sqrt(max_num/2) ||
-            vars->x0 == sqrt(max_num/2))) {
-        *check_res = 0;
-
     } else {
 
         vars->xs = vars->x0;
 
-        if(logs < vars->p && logs > 0){
+        if(strcmp(vars->function, "log") == 0) {
+            if(logs < vars->p && logs > 0){
+                f0 = compute_function(vars, vars->p);
+            } else {
+                f0 = compute_function(vars, logs);
+            }
+        } else if(strcmp(vars->function, "frac") == 0 && abs(denominator(vars->xs, max_num)) < vars->p) {
+            if(denominator(vars->x0, max_num) > 0){
+                f0 = compute_function(vars, vars->p);
+            } else {
+                f0 = compute_function(vars, -vars->p);
+            }
+        } else {
             f0 = compute_function(vars, vars->p);
-        } else {
-            f0 = compute_function(vars, logs);
         }
+        vars->xs = vars->x1; 
 
-        vars->xs = vars->x1;    
-        logs = log_argument(vars->xs, max_num);
-
-        if(logs < vars->p && logs > 0){
-            f1 = compute_function(vars, vars->p);
+        if(strcmp(vars->function, "log") == 0) {
+            logs = log_argument(vars->xs, max_num);  
+            if(logs < vars->p && logs > 0){
+                f1 = compute_function(vars, vars->p);
+            } else {
+                f1 = compute_function(vars, logs);
+            }
+        } else if(strcmp(vars->function, "frac") == 0 && abs(denominator(vars->xs, max_num)) < vars->p) {
+            if(denominator(vars->xs, max_num) > 0){
+                f1 = compute_function(vars, vars->p);
+            } else {
+                f1 = compute_function(vars, -vars->p);
+            }
         } else {
-            f1 = compute_function(vars, logs);
+            f1 = compute_function(vars, vars->p);
         }
         
         if(f0*f1 <= 0) {
@@ -101,6 +127,7 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
                     fs = compute_function(vars, logs);
                 }
 
+        // if(vars->x0 > -0.35 && vars->x1 < -0.2) printf("xs vale %lf, fs vale %lf\n", vars->xs, fs);
                 if(f0*fs < 0) {
                     vars->x1 = vars->xs;
                     f1 = fs;

@@ -96,6 +96,8 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                     params->function = argv[i+1];
                } else if(strcmp(argv[i+1], "frac") == 0) {
                     params->function = argv[i+1];
+               } else if(strcmp(argv[i+1], "sin") == 0) {
+                    params->function = argv[i+1];
                } else {
                    get_usage();
                }

@@ -17,14 +17,17 @@ int main (int argc, char* argv[]) {
     /**
      * Set initial variable
      */
-    functions *func;
     initial_variable *vars;
 
-    func = (functions *) malloc(sizeof(functions));
     vars = (initial_variable *) malloc(sizeof(initial_variable));
     
     int step = 1;
     int max_steps;
+
+    double *intervalls, *results;
+    int *check_results;
+
+    double max = get_max_num();
 
 
     /**
@@ -37,37 +40,50 @@ int main (int argc, char* argv[]) {
     /**
      * Initialize remaining variables
      */
-    max_steps = (int)(vars->x1-vars->x0)/vars->e;
+    if(vars->auto_choose) {
+        vars->x1 = max;
+        vars->x0 = -max;
+        
+        max_steps = (int)(vars->x1 - vars->x0)/vars->p;
+    }
 
-    vars->xs = vars->x0;
-	func->f0 = compute_function(vars);
-    
-    vars->xs = vars->x1;
-	func->f1 = compute_function(vars);
 
+    int max_intervalls;
+
+    if(max >= 1){
+        max_intervalls = (vars->x1-vars->x0) * max;
+    } else {
+        max_intervalls = (vars->x1-vars->x0) / max;
+    }
+
+
+    intervalls      = (double *) calloc(max_intervalls,     sizeof(double));
+    results         = (double *) calloc(max_intervalls - 1, sizeof(double));
+    check_results   = (int *)    calloc(max_intervalls - 1, sizeof(int));
+
+
+    axis_partitioning(vars->x0, vars->x1, max_intervalls, intervalls);
 
     /**
      * Starting the program
      */
-    for(int i=0; i < max_steps; i++) {
     
-	    vars->xs = vars->x0 - (vars->x0-vars->x1) * func->f0/(func->f0-func->f1);
-		func->fs = compute_function(vars);
-		
-		if(func->f0*func->fs < 0) {
-			vars->x1 = vars->xs;
-		    func->f1 = func->fs;
-		} else {
-			vars->x0 = vars->xs;
-			func->f0 = func->fs;
-		}
-		step = step + 1;
+    for(int i = 0; i < max_intervalls - 1; i++) {
+        vars->x0 = intervalls[i];
+        vars->x1 = intervalls[i+1];
+        
+        int steps = 0;
 
-        if(fabs(func->fs)<vars->e) break;
+        compute_roots(max_steps, vars, &step, &results[i], &check_results[i], &steps);
 
     }
 
-	printf("%d\t\t%f\t%f\t%f\t%f\n",step, vars->x0, vars->x1, vars->xs, func->fs);
+
+    for(int i = 0; i < max_intervalls; i++) {
+        if(check_results[i]) printf("roots found at: %lf\n", results[i]);
+    }
+    
+
     /**
      * Print the result
      */

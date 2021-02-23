@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
     if(max >= 1){
         max_intervalls = (vars->x1-vars->x0) * max;
     } else {
-        max_intervalls = (vars->x1-vars->x0) * max;
+        max_intervalls = (vars->x1-vars->x0) / max;
     }
 
     intervalls      = (double *) calloc(max_intervalls,     sizeof(double));
@@ -117,6 +117,7 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < max_intervalls - 1; i++) {
         vars->x0 = intervalls[i];
         vars->x1 = intervalls[i+1];
+        if(intervalls[i] > -0.5 && intervalls[i+1] < -0.2) printf("rank %d ha intervalli [%lf, %lf]\n", rank, intervalls[i], intervalls[i+1]);
         
         int steps = 0;
 
