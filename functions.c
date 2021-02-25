@@ -1,5 +1,25 @@
 #include "functions.h"
 
+
+
+/**
+ * Function.c File
+ * 
+ * Created by Davide Basile student at University of Salento
+ * 
+ * Project related to Parallel Algorithms exam
+ * 
+ * This file contains the function declared in functions.h
+ * 
+ */
+
+
+
+
+
+/**
+ *  Here you can define the logarithm argument or the denominator argument of the function
+ */
 // #define log_argument(var, max_num)  (2 * var / max_num) + var
 #define log_argument(var, max_num)  3 * pow(var, 2) - max_num + 3 * pow(var, 3) - 32 * var
 #define denominator(var, max_num)   (2 * pow(var,2) + max_num)
@@ -17,7 +37,9 @@ double f_sin(double var);
 
 double max_num = 43;  // Set here the max number of the funcion which have to be the value of the number not relatex to x
 
-
+/**
+ * Using the function string here we return the value of the function at the x value
+ */
 double compute_function(initial_variable *param, double arg) {
 
     double res = 0;
@@ -62,18 +84,28 @@ double f_sin(double var) {
     return 3 * pow(var, 2) * sin(2 * var + 2) - 4 * var - 1;
 }
 
-void compute_roots(int max_steps, initial_variable *vars, int *step, double *result, int *check_res, int *steps) {
+
+/**
+ * This function compute roots of the function if checks goes well
+ */
+void compute_roots(int max_steps, initial_variable *vars, double *result, int *check_res) {
 
     double f0, f1, fs;
 
     double logs = 0;
 
+    /**
+     * Here we are checking if the argument of logarithm is less than 0 
+     */
     if(strcmp(vars->function, "log") == 0 && log_argument(vars->x0, max_num) < vars->p && log_argument(vars->x1, max_num) > 0) {
         logs = vars->p;
     } else {
         logs = log_argument(vars->x0, max_num);
     }
 
+    /**
+     * When the upperbound of logarithm is less than zero we can skip the computation
+     */
     if(strcmp(vars->function, "log") == 0 && log_argument(vars->x1, max_num) < 0) {
         *check_res = 0;
 
@@ -81,6 +113,9 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
 
         vars->xs = vars->x0;
 
+        /**
+         * Just the last check of x0 about the denominator if fractional function is called
+         */
         if(strcmp(vars->function, "log") == 0) {
             if(logs < vars->p && logs > 0){
                 f0 = compute_function(vars, vars->p);
@@ -96,8 +131,12 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
         } else {
             f0 = compute_function(vars, vars->p);
         }
+
         vars->xs = vars->x1; 
 
+        /**
+         * Just the last check of x1 about the denominator if fractional function is called
+         */
         if(strcmp(vars->function, "log") == 0) {
             logs = log_argument(vars->xs, max_num);  
             if(logs < vars->p && logs > 0){
@@ -115,6 +154,9 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
             f1 = compute_function(vars, vars->p);
         }
         
+        /**
+         * If upperbound and lowerbound has different sign we can compute the root
+         */
         if(f0*f1 <= 0) {
             for(int i=0; i < max_steps; i++) {
                 
@@ -127,7 +169,6 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
                     fs = compute_function(vars, logs);
                 }
 
-        // if(vars->x0 > -0.35 && vars->x1 < -0.2) printf("xs vale %lf, fs vale %lf\n", vars->xs, fs);
                 if(f0*fs < 0) {
                     vars->x1 = vars->xs;
                     f1 = fs;
@@ -135,13 +176,10 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
                     vars->x0 = vars->xs;
                     f0 = fs;
                 }
-                *step = *step + 1;
-
-
+                                
                 if(fabs(fs) <= vars->p) {
                     *check_res = 1;
                     *result = vars->xs;
-                    *steps = i;
                     break;
                 }
             }
@@ -151,14 +189,20 @@ void compute_roots(int max_steps, initial_variable *vars, int *step, double *res
     }
 }
 
-
-void axis_partitioning(double min, double max, int intervall, double *intervalls) {
-    double intervall_size = (max-min) / intervall;
-    for(int i = 0; i < intervall; i++) {
-        intervalls[i] = min + i * intervall_size;
+/**
+ * Partition the array into interval parts
+ */
+void axis_partitioning(double min, double max, int interval, double *intervals) {
+    double interval_size = (max-min) / interval;
+    for(int i = 0; i < interval; i++) {
+        intervals[i] = min + i * interval_size;
     }
 }
 
+
+/**
+ * Return the max number inside the function
+ */
 double get_max_num() {
     return max_num;
 }

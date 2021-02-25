@@ -23,16 +23,16 @@ typedef struct {
     int auto_choose;    // like a boolean
     // int size;        // lenght of function, used in old_function.c
     char *function;     // string in which you need to identify the function you want to use,
-                        //  in old_function.c is string for the function definition
+                        // in old_function.c is string for the function definition
 } initial_variable;
 
 /**
  * Function's declaration
  */
-initial_variable *get_parameters(int argc, char* argv[]);
+initial_variable get_parameters(int argc, char* argv[]);
 double compute_function(initial_variable *param, double log_arg);
-void compute_roots(int max_steps, initial_variable *vars, int *step, double *result, int *check_res, int *steps);
-void axis_partitioning(double min, double max, int error, double *intervalls);
+void compute_roots(int max_steps, initial_variable *vars, double *result, int *check_res);
+void axis_partitioning(double min, double max, int interval, double *intervals);
 double get_max_num();
 
 

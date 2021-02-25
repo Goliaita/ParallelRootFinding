@@ -26,12 +26,11 @@ void check_character(char *character);
  * -a  let to the algorithm to compute contraint except error
  */
 
-initial_variable *get_parameters(int argc, char* argv[]) {
+initial_variable get_parameters(int argc, char* argv[]) {
 
-    initial_variable *params;
+    initial_variable params;
 
-    params = malloc(sizeof(initial_variable));
-    params->auto_choose = 0;
+    params.auto_choose = 0;
 
     // FILE *fp;
 
@@ -45,18 +44,18 @@ initial_variable *get_parameters(int argc, char* argv[]) {
 
                 check_character(argv[i+1]);
                 check = 1;
-                params->x0 = atof(argv[i+1]);
+                params.x0 = atof(argv[i+1]);
 
             } else if(strcmp(argv[i], "-x1") == 0) {
 
                 check_character(argv[i+1]);
                 check = 1;
-                params->x1 = atof(argv[i+1]);
+                params.x1 = atof(argv[i+1]);
 
             } else if(strcmp(argv[i], "-p") == 0) {
 
                 check_character(argv[i+1]);
-                params->p = atof(argv[i+1]); 
+                params.p = atof(argv[i+1]); 
 
             } else if(strcmp(argv[i], "-f") == 0) {
                 /*
@@ -68,7 +67,7 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                 fp = fopen(argv[i+1], "r");
 
                 if(!fp) {
-                    perror("Error while opening the file->\n");
+                    perror("Error while opening the file.\n");
                     exit(1);
                 }
 
@@ -82,29 +81,29 @@ initial_variable *get_parameters(int argc, char* argv[]) {
                         }
                     }
 
-                    params->size = strlen(line);
-                    params->function = malloc(params->size * sizeof(char));
-                    strcpy(params->function,line); 
+                    params.size = strlen(line);
+                    params.function = malloc(params.size * sizeof(char));
+                    strcpy(params.function,line); 
                 }
 
                 fclose(fp);
                 */
 
                if(strcmp(argv[i+1], "exp") == 0) {
-                   params->function = argv[i+1];
+                   params.function = argv[i+1];
                } else if(strcmp(argv[i+1], "log") == 0) {
-                    params->function = argv[i+1];
+                    params.function = argv[i+1];
                } else if(strcmp(argv[i+1], "frac") == 0) {
-                    params->function = argv[i+1];
+                    params.function = argv[i+1];
                } else if(strcmp(argv[i+1], "sin") == 0) {
-                    params->function = argv[i+1];
+                    params.function = argv[i+1];
                } else {
                    get_usage();
                }
 
             } else if(strcmp(argv[i], "-a") == 0) {
 
-                params->auto_choose = 1;
+                params.auto_choose = 1;
 
             } else if(strcmp(argv[i], "-h") == 0) {
                 get_usage();
@@ -112,16 +111,16 @@ initial_variable *get_parameters(int argc, char* argv[]) {
         }
     }
 
-    if(params->x0 > params->x1) {
+    if(params.x0 > params.x1) {
 
         puts("Warning x1 is less than x0 swapped\n");
 
-        params->x0 += params->x1;
-        params->x1 = params->x0 - params->x1;
-        params->x0 -= params->x1;
+        params.x0 += params.x1;
+        params.x1 = params.x0 - params.x1;
+        params.x0 -= params.x1;
 
     }
-    if(!(params->auto_choose&&check)) {
+    if(!(params.auto_choose&&check)) {
         return params;
     } else {
         puts("Got -a and [-x0, -x1] setted chose one of them");
@@ -135,7 +134,7 @@ void get_usage() {
     puts("Usage -x0 [smallest bound], -x1 [higher bound], -p [precision of computation],");
     // puts("\t-f [path to file which contain the function to compute], -a autocompute constraints\n");
     puts("\t-f [function to compute \"exp\", \"log\", \"frac\"], -a autocompute constraints");
-    puts("\tif no element passed default value are: -x0=-2; -x1=2 e=0->001");
+    puts("\tif no element passed default value are: -x0=-2; -x1=2 e=0.001");
     puts("\tThe default function is exp");
     //TODO List errors that could be encountered
 
