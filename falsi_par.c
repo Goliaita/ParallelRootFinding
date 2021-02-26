@@ -30,30 +30,30 @@ int main(int argc, char* argv[]) {
     /**
      * Gather and Scatter support variables
      */
-    int *displacement;
-    int *count;
+    int *displacement = NULL;
+    int *count = NULL;
 
     /**
      * Interval variables where we will look for a solution
      */
     double interval[2];
-    double *intervals;
+    double *intervals = NULL;
 
     /**
      *  Results buffer variables
      */
-    double *results;
-    double *collect_results;
-    double *buff_res;
+    double *results = NULL;
+    double *collect_results = NULL;
+    double *buff_res = NULL;
 
     /**
      * Counting and checking variables for solutions
      */
-    int *check_results;
-    int *results_found;
+    int *check_results = NULL;
+    int *results_found = NULL;
     int total_results = 0;
 
-    FILE *fo;
+    FILE *fo = NULL;
     
     initial_variable vars;
     
@@ -128,8 +128,6 @@ int main(int argc, char* argv[]) {
     vars.x0 = interval[0];
     vars.x1 = interval[1];  
 
-
-
     int max_intervals;
 
     if(max >= 1){
@@ -167,6 +165,8 @@ int main(int argc, char* argv[]) {
 
     free(intervals);
 
+    intervals = NULL;
+
     /**
      * Start collecting data
      */
@@ -192,6 +192,9 @@ int main(int argc, char* argv[]) {
     free(results);
     free(check_results);
 
+    results = NULL;
+    check_results = NULL;
+
     MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Gather(&result_found, 1, MPI_INT, results_found, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -210,26 +213,30 @@ int main(int argc, char* argv[]) {
         }
         
         printf("%d results found\n", total_results);
+
+        collect_results = (double *) calloc(total_results, sizeof(double));
     }
 
     MPI_Barrier(MPI_COMM_WORLD); 
 
-    collect_results = (double *) calloc(total_results, sizeof(float));
 
     MPI_Gatherv(buff_res, result_found, MPI_DOUBLE, collect_results, results_found, displacement, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     free(displacement);
     free(count);
     free(results_found);
-    MPI_Barrier(MPI_COMM_WORLD);
+
+    displacement = NULL;
+    count = NULL;
+    results_found = NULL;
  
     /**
      * Print results
      */
     if(rank == 0) {
         printf("\n");
-
-        // if((fo = fopen("./results.txt", "w+")) == NULL) perror("Unable to open file");
 
         if(total_results != 0) {
             for(int k = 0; k < total_results; k++){
@@ -241,10 +248,13 @@ int main(int argc, char* argv[]) {
 
         
         free(buff_res);
+        free(collect_results);
+
+        buff_res = NULL;
+        collect_results = NULL;
     }
 
 
-    free(collect_results);
     MPI_Finalize();
 
     return 0;
