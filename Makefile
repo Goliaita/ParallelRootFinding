@@ -36,7 +36,7 @@ run:
 	mpiexec $(RUNFLAGS) $(N) $(OUTP) $(PARAMS)
 
 run-pres:
-	mpiexec $(RUNFLAGS) 4 $(OUTP) -x0 -1000 -x1 1000 -p 0.0001 -f sin
+	mpiexec $(RUNFLAGS) 8 $(OUTP) -x0 -50000 -x1 50000 -p 0.001 -f sin
 
 clean:
 	rm $(OUTSEQ) $(OUTP) 2>/dev/null

@@ -21,6 +21,8 @@ int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
 
+    double time;
+
     /**
      * MPI variables
      */
@@ -62,6 +64,8 @@ int main(int argc, char* argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &p);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);    
 
+    time = -MPI_Wtime();
+
     /**
      * Initializing variables
      */
@@ -74,11 +78,7 @@ int main(int argc, char* argv[]) {
      * Getting data from command line
      */
     vars = get_parameters(argc, argv);
-
-    /**
-     * Computing the steps we will do at most
-     */
-    max_steps = (int)(vars.x1 - vars.x0)/vars.p;    
+  
     double max = get_max_num();   
 
     /**
@@ -87,8 +87,6 @@ int main(int argc, char* argv[]) {
     if(vars.auto_choose) {
         vars.x1 = max;
         vars.x0 = -max;
-        
-        max_steps = (int)(vars.x1 - vars.x0)/vars.p;
     } 
 
     /**
@@ -98,10 +96,10 @@ int main(int argc, char* argv[]) {
         /**
          * Opening file to store results
          */
-        if((fo = fopen("./results.txt", "w+")) == NULL) {
-            perror("fileopen");
-        }
-        fprintf(fo, "%s", "\n");
+        // if((fo = fopen("./results.txt", "w+")) == NULL) {
+        //     perror("fileopen");
+        // }
+        // fprintf(fo, "%s", "\n");
 
         /**
          * Partitioning the entire array to processes and then preparing
@@ -119,14 +117,20 @@ int main(int argc, char* argv[]) {
 
 
     /**
-     * Let all process wait the process 0 then scatter the interval to all process
+     * Scattering the interval to all process
      */
-    MPI_Barrier(MPI_COMM_WORLD);
-
     MPI_Scatterv(intervals, count, displacement, MPI_DOUBLE, interval, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     vars.x0 = interval[0];
     vars.x1 = interval[1];  
+
+
+    /**
+     * Computing the steps we will do at most
+     */
+    max_steps = (int)(vars.x1 - vars.x0)/vars.p;  
+
+    printf("\nMax step computized are: %d\n", max_steps);
 
     int max_intervals;
 
@@ -135,6 +139,8 @@ int main(int argc, char* argv[]) {
     } else {
         max_intervals = (vars.x1-vars.x0) / max;
     }
+
+    printf("\nMax intervals of x axis are: %d\n", max_intervals);
 
     /**
      * Set up remaining variables
@@ -195,8 +201,6 @@ int main(int argc, char* argv[]) {
     results = NULL;
     check_results = NULL;
 
-    MPI_Barrier(MPI_COMM_WORLD);
-
     MPI_Gather(&result_found, 1, MPI_INT, results_found, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     /**
@@ -217,12 +221,7 @@ int main(int argc, char* argv[]) {
         collect_results = (double *) calloc(total_results, sizeof(double));
     }
 
-    MPI_Barrier(MPI_COMM_WORLD); 
-
-
     MPI_Gatherv(buff_res, result_found, MPI_DOUBLE, collect_results, results_found, displacement, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-    MPI_Barrier(MPI_COMM_WORLD);
 
     free(displacement);
     free(count);
@@ -231,21 +230,29 @@ int main(int argc, char* argv[]) {
     displacement = NULL;
     count = NULL;
     results_found = NULL;
+
+    time += MPI_Wtime();
  
     /**
      * Print results
      */
     if(rank == 0) {
         printf("\n");
-
+        
         if(total_results != 0) {
+
+            if((fo = fopen("./results.txt", "w+")) == NULL) {
+                perror("fileopen");
+            }
+
             for(int k = 0; k < total_results; k++){
-                fprintf(fo, "%s %s %s %lf\n","root", "found", "at", collect_results[k]);
+                fprintf(fo, "%lf\n", collect_results[k]);
             }
         } else {
             puts("\tNo roots found\n");
         }
 
+        printf("Total compute time is:%lf\n", time);
         
         free(buff_res);
         free(collect_results);
