@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
      */
     max_steps = (int)(vars.x1 - vars.x0)/vars.p;  
 
-    printf("\nMax step computized are: %d\n", max_steps);
+    if(rank == 0) printf("\nMax step computized are: %d\n", max_steps);
 
     int max_intervals;
 
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
         max_intervals = (vars.x1-vars.x0) / max;
     }
 
-    printf("\nMax intervals of x axis are: %d\n", max_intervals);
+    if(rank == 0) printf("\nMax intervals of x axis are: %d\n", max_intervals);
 
     /**
      * Set up remaining variables
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < max_intervals - 1; i++) {
         vars.x0 = intervals[i];
         vars.x1 = intervals[i+1];        
-
+        if(rank == 0 && i == max_intervals / 2) printf("half of intervals");
         compute_roots(max_steps, &vars, &results[i], &check_results[i]);
     }
 

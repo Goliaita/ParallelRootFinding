@@ -160,7 +160,8 @@ void compute_roots(int max_steps, initial_variable *vars, double *result, int *c
         if(f0*f1 <= 0) {
             for(int i=0; i < max_steps; i++) {
                 
-                vars->xs = (vars->x0 * f1 - vars->x1 * f0)/(f1 - f0);
+                // vars->xs = (vars->x0 * f1 - vars->x1 * f0)/(f1 - f0);
+                vars->xs = (vars->x0 + vars->x1) / 2;
 
                 logs = log_argument(vars->xs, max_num);
                 if(logs < vars->p && logs > 0){

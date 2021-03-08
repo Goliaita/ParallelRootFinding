@@ -4,3 +4,7 @@ falsi_par
 test*
 results.txt
 results_seq.txt
+Documentation/figs/*
+Documentation/*.tex
+Documentation/*.aux
+
