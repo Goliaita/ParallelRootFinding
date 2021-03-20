@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <time.h>
 
 /**
  * Falsi_seq.c File
@@ -27,6 +28,8 @@ int main (int argc, char* argv[]) {
     int *check_results;
 
     double max = get_max_num();
+
+    double time = -clock();
 
 
     /**
@@ -73,6 +76,9 @@ int main (int argc, char* argv[]) {
         compute_roots(max_steps, &vars, &results[i], &check_results[i]);
     }
 
+    time = (time + clock()) / CLOCKS_PER_SEC;
+
+
     /**
      * Ending computation
      */
@@ -93,6 +99,8 @@ int main (int argc, char* argv[]) {
     }
 
     printf("\n\n\t found %d roots\n", results_found);
+    printf("Computation time: %lf", time);
 
     return 0;
+
 }
