@@ -20,7 +20,6 @@
 /**
  *  Here you can define the logarithm argument or the denominator argument of the function
  */
-// #define log_argument(var, max_num)  (2 * var / max_num) + var
 #define log_argument(var, max_num)  3 * pow(var, 2) - max_num + 3 * pow(var, 3) - 32 * var
 #define denominator(var, max_num)   (2 * pow(var,2) + max_num)
 
@@ -67,8 +66,6 @@ double f_exp(double var) {
 
 
 double f_log(double var, double log_arg) {
-    // 2x-log(2x/5+x)-2
-    // return 2 * var - log(log_arg) - 2;
     // 3x^2+2x^5-log(3x+1)-43x^3-10+34x
     return 3 * pow(var, 2) + 2 * pow(var, 5) - log(log_arg) - max_num * pow(var, 3) - 10 + 34 * var;
 }
@@ -189,6 +186,7 @@ void compute_roots(int max_steps, initial_variable *vars, double *result, int *c
         }        
     }
 }
+
 
 /**
  * Partition the array into interval parts

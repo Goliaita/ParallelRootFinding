@@ -94,14 +94,6 @@ int main(int argc, char* argv[]) {
      */
     if(rank == 0){
         /**
-         * Opening file to store results
-         */
-        // if((fo = fopen("./results.txt", "w+")) == NULL) {
-        //     perror("fileopen");
-        // }
-        // fprintf(fo, "%s", "\n");
-
-        /**
          * Partitioning the entire array to processes and then preparing
          * variables to scatter the intervalls to all processes
          */
@@ -115,7 +107,6 @@ int main(int argc, char* argv[]) {
         
     }
 
-
     /**
      * Scattering the interval to all process
      */
@@ -124,13 +115,10 @@ int main(int argc, char* argv[]) {
     vars.x0 = interval[0];
     vars.x1 = interval[1];  
 
-
     /**
      * Computing the steps we will do at most
      */
     max_steps = (int)(vars.x1 - vars.x0)/vars.p;  
-
-    if(rank == 0) printf("\nMax step computized are: %d\n", max_steps);
 
     int max_intervals;
 
@@ -139,8 +127,6 @@ int main(int argc, char* argv[]) {
     } else {
         max_intervals = (vars.x1-vars.x0) / max;
     }
-
-    if(rank == 0) printf("\nMax intervals of x axis are: %d\n", max_intervals);
 
     /**
      * Set up remaining variables
@@ -159,7 +145,7 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < max_intervals - 1; i++) {
         vars.x0 = intervals[i];
         vars.x1 = intervals[i+1];        
-        if(rank == 0 && i == max_intervals / 2) printf("half of intervals");
+
         compute_roots(max_steps, &vars, &results[i], &check_results[i]);
     }
 

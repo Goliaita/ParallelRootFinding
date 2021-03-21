@@ -132,14 +132,11 @@ initial_variable get_parameters(int argc, char* argv[]) {
 
 void get_usage() {
     puts("Usage -x0 [smallest bound], -x1 [higher bound], -p [precision of computation],");
-    // puts("\t-f [path to file which contain the function to compute], -a autocompute constraints\n");
+    // puts("\t-f [path to file which contain the function to compute], -a autocompute constraints\n");  // For old_functions.c
     puts("\t-f [function to compute \"exp\", \"log\", \"frac\"], -a autocompute constraints");
     puts("\tif no element passed default value are: -x0=-2; -x1=2 e=0.001");
     puts("\tThe default function is exp");
-    //TODO List errors that could be encountered
-
     exit(1);
-
 }
 
 
